@@ -1,39 +1,45 @@
-addEventListener("DOMContentLoaded", function(){
-    document.querySelector("#addBtn").addEventListener("click", addSong)
-})
+const API_BASE =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://backend-1rmn.onrender.com";
 
-// add the song to the database, it needs to be an async function
+addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("#addForm");
+  const titleEl = document.querySelector("#title");
+  const artistEl = document.querySelector("#artist");
+  const releasedEl = document.querySelector("#released");
+  const popularityEl = document.querySelector("#popularity");
+  const genreEl = document.querySelector("#genre");
+  const msgEl = document.querySelector("#msg");
+  const errEl = document.querySelector("#error");
 
-async function addSong(){
-    // create a song object on the form that the user fills out.
-    const song = {
-        title: document.querySelector("#title").value,
-        artist: document.querySelector("#artist").value,
-        releaseDate: document.querySelector("#released").value,
-        popularity: document.querySelector("#popularity").value,
-        genre: document.querySelector("#genre").value ? document.querySelector("#genre").value.split(",") : []
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msgEl.textContent = "";
+    errEl.textContent = "";
 
-    }
+    const body = {
+      title: titleEl.value.trim(),
+      artist: artistEl.value.trim(),
+      popularity: Number(popularityEl.value),
+      releaseDate: releasedEl.value ? new Date(releasedEl.value).toISOString() : null,
+      genre: genreEl.value.trim() ? genreEl.value.split(",").map((g) => g.trim()).filter(Boolean) : [],
+    };
 
-    const response = await fetch("http://localhost:3000/api/songs",{
+    try {
+      const res = await fetch(`${API_BASE}/api/songs`, {
         method: "POST",
-        headers:{
-            "Content-Type" : "application/json"
-        },
-        body: JSON.stringify(song)
-    })
-
-    if(response.ok){
-        const results = await response.json()
-        alert("Added song with ID of" + results._id)
-
-        // reset the form after song is added 
-        document.querySelector("form").reset()
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const created = await res.json();
+      msgEl.style.color = "green";
+      msgEl.textContent = `Added song with ID ${created._id ?? "(unknown)"}`;
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      errEl.textContent = "Failed to add song.";
     }
-
-    else{
-        document.querySelector("#error").innerHTML = "Cannot add song"
-    }
-
-
-}
+  });
+});

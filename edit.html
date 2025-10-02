@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Front End</title>
-    <script src="scripts/edit.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Song</title>
+  <script src="scripts/edit.js" defer></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; line-height: 1.5; }
+    nav a { margin-right: 1rem; }
+    label { display:block; margin-top: .75rem; }
+    input[type="text"], input[type="date"], input[type="number"] { padding:.5rem; width: 320px; max-width: 100%; }
+    button { margin-top: 1rem; padding:.6rem 1rem; }
+  </style>
 </head>
 <body>
-    <nav>
-        <a href="/index.html">All Songs</a>
-        <a href="/add_song.html">Add Songs</a>
-    </nav>
-    <form>
-        <div>
-            <label for="title">Title:</label>
-            <input type="text" id="title">
-        </div>
-        <div>
-            <label for="artist">Artist:</label>
-            <input type="text" id="artist">
-        </div>
-        <div>
-            <label for="released">Released:</label>
-            <input type="date" id="released">
-        </div>
-        <div>
-            <label for="popularity">Popularity:</label>
-            <input type="number" min="1" max="10" id="popularity">
-        </div>
-        <div>
-            <label for="genre">Genre:</label>
-            <input type="text" id="genre">
-        </div>
-        <div>
-            <input type="button" id="updateBtn" value="Update Song">
-        </div>
-        <div id="error"></div>
-    </form>
+  <nav>
+    <a href="index.html">All Songs</a>
+    <a href="add_song.html">Add Songs</a>
+  </nav>
 
-    
+  <h1>Edit Song</h1>
+
+  <form id="editForm">
+    <label for="title">Title:</label>
+    <input id="title" type="text" required />
+
+    <label for="artist">Artist:</label>
+    <input id="artist" type="text" required />
+
+    <label for="released">Release Date:</label>
+    <input id="released" type="date" required />
+
+    <label for="popularity">Popularity (1–10):</label>
+    <input id="popularity" type="number" min="1" max="10" required />
+
+    <label for="genre">Genre(s) (comma-separated):</label>
+    <input id="genre" type="text" placeholder="pop, rock" />
+
+    <button type="submit" id="updateBtn">Update Song</button>
+  </form>
+
+  <div id="msg" style="margin-top:.75rem;"></div>
+  <div id="error" style="color:crimson; margin-top:.5rem;"></div>
 </body>
 </html>

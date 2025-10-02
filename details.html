@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Front End</title>
-    <script src="scripts/details.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Song Details</title>
+  <script src="scripts/details.js" defer></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; line-height: 1.5; }
+    nav a { margin-right: 1rem; }
+  </style>
 </head>
 <body>
-    <nav>
-        <a href="/index.html">All Songs</a>
-        <a href="/add_song.html">Ass Songs</a>
-    </nav>
-    <h1></h1>
-    <div></div>
+  <nav>
+    <a href="index.html">All Songs</a>
+    <a href="add_song.html">Add Songs</a>
+  </nav>
+
+  <h1 id="title"></h1>
+  <div id="details"></div>
+  <div id="error" style="color:crimson;"></div>
 </body>
 </html>

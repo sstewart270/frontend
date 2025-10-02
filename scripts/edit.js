@@ -1,45 +1,69 @@
-addEventListener("DOMContentLoaded", async function(){
-    document.querySelector("updateBtn").addEventListener("click", updateSong)
-    const urlparam = new URLSearchParams(this.window.location.search)
-    const songID = urlparam.get('id')
-    const response = await fetch("http://localhost:3000/api/songs/" + songID)
-    if(response.ok){
-        let song = await response.json()
-        document.querySelector("#songId").value = song._id
-        document.querySelector("#title").value = song.title
-        document.querySelector("#artist").value = song.artist
-        document.querySelector("#released").value = song.releaseDate.substring(0,10)
-        document.querySelector("#popularity").value = song.popularity
-        document.querySelector("#genre").value = song.genre
-    }
+const API_BASE =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://backend-1rmn.onrender.com";
 
+addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
-})
+  const form = document.querySelector("#editForm");
+  const titleEl = document.querySelector("#title");
+  const artistEl = document.querySelector("#artist");
+  const releasedEl = document.querySelector("#released");
+  const popularityEl = document.querySelector("#popularity");
+  const genreEl = document.querySelector("#genre");
+  const msgEl = document.querySelector("#msg");
+  const errEl = document.querySelector("#error");
 
-async function updateSong(){
-    // create song object from form fields
-    const songID = document.querySelector("#songID").value
-    const song = {
-        _id: document.querySelector("#songId").value,
-        title: document.querySelector("#title").value,
-        artist: document.querySelector("#artist").value,
-        releaseDate: document.querySelector("#released").value,
-        popularity: document.querySelector("#popularity").value,
-        genre: document.querySelector("#genre").value ?
-           document.querySelector("#genre").value.split(",") : []
-    }
-    const response = await fetch("http://localhost:3000/api/songs/" + songID,{
-       method: "PUT",
-       headers: {
-           "Content-Type": "application/json"
-       },
-       body: JSON.stringify(song)
-    })
+  if (!id) {
+    errEl.textContent = "Missing song id.";
+    return;
+  }
 
-    if(response.ok){
-        alert("Updated Song")
+  // Load current values
+  try {
+    const res = await fetch(`${API_BASE}/api/songs/${id}`);
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
+    const song = await res.json();
+
+    titleEl.value = song.title ?? "";
+    artistEl.value = song.artist ?? "";
+    popularityEl.value = song.popularity ?? "";
+    // releaseDate -> yyyy-mm-dd for <input type="date">
+    releasedEl.value = song.releaseDate ? new Date(song.releaseDate).toISOString().slice(0, 10) : "";
+    genreEl.value = Array.isArray(song.genre) ? song.genre.join(", ") : "";
+  } catch (err) {
+    console.error(err);
+    errEl.textContent = "Could not load song for editing.";
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msgEl.textContent = "";
+    errEl.textContent = "";
+
+    const body = {
+      title: titleEl.value.trim(),
+      artist: artistEl.value.trim(),
+      popularity: Number(popularityEl.value),
+      releaseDate: releasedEl.value ? new Date(releasedEl.value).toISOString() : null,
+      genre: genreEl.value.trim() ? genreEl.value.split(",").map((g) => g.trim()).filter(Boolean) : [],
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/songs/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      msgEl.style.color = "green";
+      msgEl.textContent = "Song updated!";
+    } catch (err) {
+      console.error(err);
+      errEl.textContent = "Failed to update song.";
     }
-    else{
-        document.querySelector("#error").innerHTML = "Cannot update song"
-    }
-}
+  });
+});
